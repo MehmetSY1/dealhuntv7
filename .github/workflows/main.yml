@@ -18,17 +18,19 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
-      - name: Check and fix structure
+      - name: Fix missing files
         run: |
-          echo "=== Repo kok ==="
-          ls -la
-          echo "=== DealHuntV2 ici ==="
-          ls -la DealHuntV2/ 2>/dev/null || echo "KLASOR YOK"
+          # gradle.properties
+          cat > DealHuntV2/gradle.properties << 'EOF'
+          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
+          android.useAndroidX=true
+          android.enableJetifier=true
+          kotlin.code.style=official
+          EOF
 
           # settings.gradle yoksa olustur
           if [ ! -f "DealHuntV2/settings.gradle" ]; then
-            echo "settings.gradle BULUNAMADI - olusturuluyor..."
-            cat > DealHuntV2/settings.gradle << 'GRADLE'
+            cat > DealHuntV2/settings.gradle << 'EOF'
           pluginManagement {
               repositories {
                   google()
@@ -42,21 +44,10 @@ jobs:
           }
           rootProject.name = "DealHunt"
           include ':app'
-          GRADLE
+          EOF
           fi
 
-          # build.gradle yoksa olustur
-          if [ ! -f "DealHuntV2/build.gradle" ]; then
-            echo "build.gradle BULUNAMADI - olusturuluyor..."
-            cat > DealHuntV2/build.gradle << 'GRADLE'
-          plugins {
-              id 'com.android.application' version '8.2.2' apply false
-              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
-          }
-          GRADLE
-          fi
-
-          echo "=== Sonuc ==="
+          echo "=== DealHuntV2 dosyalari ==="
           ls -la DealHuntV2/
 
       - name: Download fonts

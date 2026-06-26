@@ -18,6 +18,13 @@ jobs:
 
       - uses: android-actions/setup-android@v3
 
+      - name: Check structure
+        run: |
+          echo "=== Repo kok ==="
+          ls -la
+          echo "=== DealHuntV2 ici ==="
+          ls -la DealHuntV2/ || echo "DealHuntV2 klasoru YOK"
+
       - name: Download fonts
         run: |
           mkdir -p DealHuntV2/app/src/main/res/font

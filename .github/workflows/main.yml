@@ -20,47 +20,65 @@ jobs:
 
       - name: Fix missing files
         run: |
-          cat > DealHuntV2/gradle.properties << 'GPROPS'
+          # gradle.properties
+          cat > DealHuntV2/gradle.properties << 'EOF'
           org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
           android.useAndroidX=true
           android.enableJetifier=true
           kotlin.code.style=official
-          GPROPS
+          EOF
 
-          cat > DealHuntV2/settings.gradle << 'SETTINGS'
+          # settings.gradle
+          cat > DealHuntV2/settings.gradle << 'EOF'
           pluginManagement {
               repositories {
-                  google {
-                      content {
-                          includeGroupByRegex("com\\.android.*")
-                          includeGroupByRegex("com\\.google.*")
-                          includeGroupByRegex("androidx.*")
-                      }
-                  }
+                  google { content { includeGroupByRegex("com\\.android.*"); includeGroupByRegex("com\\.google.*"); includeGroupByRegex("androidx.*") } }
                   mavenCentral()
                   gradlePluginPortal()
               }
           }
           dependencyResolutionManagement {
               repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-              repositories {
-                  google()
-                  mavenCentral()
-              }
+              repositories { google(); mavenCentral() }
           }
           rootProject.name = "DealHunt"
           include ':app'
-          SETTINGS
+          EOF
 
-          cat > DealHuntV2/build.gradle << 'BUILDGRADLE'
+          # build.gradle
+          cat > DealHuntV2/build.gradle << 'EOF'
           plugins {
               id 'com.android.application' version '8.2.2' apply false
               id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
           }
-          BUILDGRADLE
+          EOF
 
-          echo "=== Dosyalar ==="
+          # AndroidManifest.xml
+          mkdir -p DealHuntV2/app/src/main
+          cat > DealHuntV2/app/src/main/AndroidManifest.xml << 'EOF'
+          <?xml version="1.0" encoding="utf-8"?>
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET"/>
+              <application
+                  android:allowBackup="true"
+                  android:icon="@mipmap/ic_launcher"
+                  android:roundIcon="@mipmap/ic_launcher_round"
+                  android:label="DealHunt"
+                  android:theme="@style/Theme.DealHunt">
+                  <activity android:name=".ui.MainActivity" android:exported="true" android:windowSoftInputMode="adjustResize">
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN"/>
+                          <category android:name="android.intent.category.LAUNCHER"/>
+                      </intent-filter>
+                  </activity>
+                  <activity android:name=".ui.DetailActivity" android:exported="false" android:parentActivityName=".ui.MainActivity"/>
+              </application>
+          </manifest>
+          EOF
+
+          echo "=== Kontrol ==="
           ls -la DealHuntV2/
+          ls -la DealHuntV2/app/src/main/
 
       - name: Download fonts
         run: |

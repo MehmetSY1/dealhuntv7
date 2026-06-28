@@ -21,15 +21,10 @@ jobs:
       - name: Fix missing files
         run: |
           # gradle.properties
-          cat > DealHuntV2/gradle.properties << 'EOF'
-          org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-          android.useAndroidX=true
-          android.enableJetifier=true
-          kotlin.code.style=official
-          EOF
+          printf 'org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8\nandroid.useAndroidX=true\nandroid.enableJetifier=true\nkotlin.code.style=official\n' > DealHuntV2/gradle.properties
 
           # settings.gradle
-          cat > DealHuntV2/settings.gradle << 'EOF'
+          cat > DealHuntV2/settings.gradle << 'SETTINGS'
           pluginManagement {
               repositories {
                   google { content { includeGroupByRegex("com\\.android.*"); includeGroupByRegex("com\\.google.*"); includeGroupByRegex("androidx.*") } }
@@ -43,19 +38,14 @@ jobs:
           }
           rootProject.name = "DealHunt"
           include ':app'
-          EOF
+          SETTINGS
 
           # build.gradle
-          cat > DealHuntV2/build.gradle << 'EOF'
-          plugins {
-              id 'com.android.application' version '8.2.2' apply false
-              id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
-          }
-          EOF
+          printf 'plugins {\n    id "com.android.application" version "8.2.2" apply false\n    id "org.jetbrains.kotlin.android" version "1.9.22" apply false\n}\n' > DealHuntV2/build.gradle
 
-          # AndroidManifest.xml
+          # AndroidManifest
           mkdir -p DealHuntV2/app/src/main
-          cat > DealHuntV2/app/src/main/AndroidManifest.xml << 'EOF'
+          cat > DealHuntV2/app/src/main/AndroidManifest.xml << 'MANIFEST'
           <?xml version="1.0" encoding="utf-8"?>
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET"/>
@@ -74,11 +64,68 @@ jobs:
                   <activity android:name=".ui.DetailActivity" android:exported="false" android:parentActivityName=".ui.MainActivity"/>
               </application>
           </manifest>
-          EOF
+          MANIFEST
+
+          # Tema (styles.xml)
+          mkdir -p DealHuntV2/app/src/main/res/values
+          cat > DealHuntV2/app/src/main/res/values/styles.xml << 'STYLES'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <style name="Theme.DealHunt" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+                  <item name="colorPrimary">#00E5A0</item>
+                  <item name="colorPrimaryVariant">#00E5A0</item>
+                  <item name="colorOnPrimary">#0A0C10</item>
+                  <item name="android:colorBackground">#0A0C10</item>
+                  <item name="colorSurface">#12151C</item>
+                  <item name="colorOnSurface">#F0F2F5</item>
+                  <item name="android:statusBarColor">#0A0C10</item>
+                  <item name="android:navigationBarColor">#0A0C10</item>
+                  <item name="android:windowLightStatusBar">false</item>
+              </style>
+          </resources>
+          STYLES
+
+          # Mipmap ikonlar
+          for dir in mipmap-hdpi mipmap-xhdpi mipmap-xxhdpi mipmap-xxxhdpi; do
+            mkdir -p DealHuntV2/app/src/main/res/$dir
+            cat > DealHuntV2/app/src/main/res/$dir/ic_launcher.xml << 'ICON'
+          <?xml version="1.0" encoding="utf-8"?>
+          <adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+              <background android:drawable="@color/ic_launcher_background"/>
+              <foreground android:drawable="@drawable/ic_launcher_foreground"/>
+          </adaptive-icon>
+          ICON
+            cp DealHuntV2/app/src/main/res/$dir/ic_launcher.xml DealHuntV2/app/src/main/res/$dir/ic_launcher_round.xml
+          done
+
+          # Launcher arka plan rengi
+          cat >> DealHuntV2/app/src/main/res/values/styles.xml << 'COLORS'
+          <!-- launcher color added separately -->
+          COLORS
+
+          # Basit ic_launcher_background color
+          mkdir -p DealHuntV2/app/src/main/res/values
+          cat > DealHuntV2/app/src/main/res/values/ic_launcher_background.xml << 'LAUNCHERBG'
+          <?xml version="1.0" encoding="utf-8"?>
+          <resources>
+              <color name="ic_launcher_background">#0A0C10</color>
+          </resources>
+          LAUNCHERBG
+
+          # ic_launcher_foreground drawable
+          mkdir -p DealHuntV2/app/src/main/res/drawable
+          cat > DealHuntV2/app/src/main/res/drawable/ic_launcher_foreground.xml << 'FGICON'
+          <?xml version="1.0" encoding="utf-8"?>
+          <vector xmlns:android="http://schemas.android.com/apk/res/android"
+              android:width="108dp" android:height="108dp"
+              android:viewportWidth="108" android:viewportHeight="108">
+              <path android:fillColor="#00E5A0"
+                  android:pathData="M54,18 L68,42 L94,42 L74,58 L82,82 L54,66 L26,82 L34,58 L14,42 L40,42 Z"/>
+          </vector>
+          FGICON
 
           echo "=== Kontrol ==="
-          ls -la DealHuntV2/
-          ls -la DealHuntV2/app/src/main/
+          ls -la DealHuntV2/app/src/main/res/
 
       - name: Download fonts
         run: |
